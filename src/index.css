@@ -1,0 +1,81 @@
+/* Importación de Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,700;1,9..144,400;1,9..144,500&display=swap');
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* Estilos Tipográficos Básicos */
+  .font-display {
+    font-family: 'Fraunces', Georgia, serif;
+  }
+  
+  .font-body {
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* Animación e Interacción de Imágenes */
+  .hero-img {
+    @apply transition-transform duration-500 ease-out;
+  }
+  .hero-img:hover {
+    transform: scale(1.02);
+  }
+
+  /* Efecto de Elevación y Sombra Homogénea en Tarjetas */
+  .card-lift {
+    @apply transition-all duration-200 ease-out shadow-sm;
+  }
+  .card-lift:hover {
+    @apply -translate-y-1 shadow-[0_20px_40px_rgba(15,40,80,0.10)];
+  }
+
+  /* Botones Principales y Secundarios */
+  .btn-primary {
+    background-color: #0F2850;
+    @apply text-white transition-all duration-200 ease-out rounded-xl text-sm font-semibold px-5 py-2.5;
+  }
+  .btn-primary:hover {
+    background-color: #1a3a6e;
+    @apply -translate-y-[1px] shadow-[0_8px_24px_rgba(15,40,80,0.28)];
+  }
+
+  .btn-outline {
+    @apply bg-white text-[#0F2850] border-[1.5px] border-slate-300 transition-all duration-200 rounded-xl text-sm font-semibold;
+  }
+  .btn-outline:hover {
+    @apply border-[#0F2850] bg-blue-50/50 -translate-y-[1px];
+  }
+
+  /* Enlaces de Navegación */
+  .nav-link {
+    @apply transition-colors duration-200 hover:text-[#0F2850];
+  }
+
+  /* Tarjetas Horizontales de Pasos */
+  .step-card {
+    @apply transition-transform duration-200 ease-out shadow-sm bg-white border border-slate-100 rounded-2xl relative;
+  }
+  .step-card:hover {
+    @apply -translate-y-[3px];
+  }
+
+  /* Botones de Llamado a la Acción (CTA) */
+  .cta-btn {
+    @apply transition-all duration-200 hover:bg-white/95 hover:-translate-y-[1px];
+  }
+
+  /* Insignias de Verificación y Etiquetas */
+  .tag-badge {
+    background-color: #E8F5EE;
+    color: #1A6645;
+    border: 1px solid #B8E0CA;
+  }
+
+  /* Forzar cursores interactivos globales */
+  .btn-primary, .btn-outline, .cta-btn, .nav-link, .card-lift, .step-card {
+    cursor: pointer;
+  }
+}
