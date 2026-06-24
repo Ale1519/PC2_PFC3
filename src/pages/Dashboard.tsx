@@ -1,12 +1,17 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
-import { ShieldAlert, ShieldCheck, ThermometerSnowflake, MapPin, Store, AlertTriangle, Plus } from 'lucide-react';
+import { 
+  ShieldAlert, ShieldCheck, ThermometerSnowflake, 
+  MapPin, Store, AlertTriangle, Plus, Search, 
+  TrendingDown, AlertOctagon, Activity 
+} from 'lucide-react';
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [vendedores, setVendedores] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [busqueda, setBusqueda] = useState(''); // Estado para el buscador
 
   useEffect(() => {
     fetchVendedores();
@@ -36,16 +41,31 @@ export default function Dashboard() {
     }
   };
 
+  // --- LÓGICA DE ESTADÍSTICAS Y FILTROS ---
+  const vendedoresFiltrados = vendedores.filter(v => 
+    v.nombre_puesto.toLowerCase().includes(busqueda.toLowerCase()) || 
+    v.ubicacion.toLowerCase().includes(busqueda.toLowerCase())
+  );
+
+  const totalClausurados = vendedores.filter(v => {
+    const ultima = v.inspecciones?.[v.inspecciones.length - 1];
+    return ultima?.estado_sanitario === 'Clausurado';
+  }).length;
+
+  const totalEngaños = vendedores.filter(v => v.transparencia_ingredientes === false).length;
+
   return (
     <div className="min-h-screen bg-slate-50 p-6 md:p-12">
-      <div className="max-w-6xl mx-auto">
-        <header className="mb-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+      <div className="max-w-7xl mx-auto">
+        
+        {/* CABECERA */}
+        <header className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
           <div>
             <div className="flex items-center gap-3 mb-2">
               <ShieldCheck className="h-10 w-10 text-emerald-600" />
               <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">PotaSegura</h1>
             </div>
-            <p className="text-lg text-slate-600">Sistema de trazabilidad sanitaria y transparencia para vendedores de ceviche ambulante.</p>
+            <p className="text-lg text-slate-600">Centro de Monitoreo Sanitario de Cevicherías Ambulantes.</p>
           </div>
           
           <button 
@@ -57,13 +77,65 @@ export default function Dashboard() {
           </button>
         </header>
 
+        {/* MÉTRICAS (NUEVO) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+            <div className="bg-blue-100 p-4 rounded-xl text-blue-600">
+              <Activity className="h-6 w-6" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Total Registrados</p>
+              <p className="text-3xl font-black text-slate-800">{vendedores.length}</p>
+            </div>
+          </div>
+
+          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+            <div className="bg-red-100 p-4 rounded-xl text-red-600">
+              <AlertOctagon className="h-6 w-6" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Puestos Clausurados</p>
+              <p className="text-3xl font-black text-red-600">{totalClausurados}</p>
+            </div>
+          </div>
+
+          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+            <div className="bg-amber-100 p-4 rounded-xl text-amber-600">
+              <TrendingDown className="h-6 w-6" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Alertas de Engaño</p>
+              <p className="text-3xl font-black text-amber-600">{totalEngaños}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* BUSCADOR (NUEVO) */}
+        <div className="mb-8 relative">
+          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <Search className="h-5 w-5 text-slate-400" />
+          </div>
+          <input
+            type="text"
+            placeholder="Buscar por nombre de carretilla o ubicación (Ej: Surco, Grau)..."
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+            className="w-full bg-white border border-slate-200 rounded-xl py-4 pl-12 pr-4 text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
+          />
+        </div>
+
+        {/* LISTADO DE TARJETAS */}
         {loading ? (
           <div className="flex justify-center p-20">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
           </div>
+        ) : vendedoresFiltrados.length === 0 ? (
+          <div className="bg-white rounded-2xl border border-dashed border-slate-300 p-12 text-center">
+            <p className="text-slate-500 font-medium">No se encontraron resultados para "{busqueda}".</p>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {vendedores.map((vendedor) => {
+            {vendedoresFiltrados.map((vendedor) => {
               const ultimaInspeccion = vendedor.inspecciones && vendedor.inspecciones.length > 0 
                 ? vendedor.inspecciones[vendedor.inspecciones.length - 1] 
                 : null;
