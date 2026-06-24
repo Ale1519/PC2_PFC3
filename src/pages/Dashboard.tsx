@@ -4,14 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import { 
   ShieldAlert, ShieldCheck, ThermometerSnowflake, 
   MapPin, Store, AlertTriangle, Plus, Search, 
-  TrendingDown, AlertOctagon, Activity 
+  TrendingDown, AlertOctagon, Activity, Pencil 
 } from 'lucide-react';
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [vendedores, setVendedores] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [busqueda, setBusqueda] = useState(''); // Estado para el buscador
+  const [busqueda, setBusqueda] = useState('');
 
   useEffect(() => {
     fetchVendedores();
@@ -41,7 +41,6 @@ export default function Dashboard() {
     }
   };
 
-  // --- LÓGICA DE ESTADÍSTICAS Y FILTROS ---
   const vendedoresFiltrados = vendedores.filter(v => 
     v.nombre_puesto.toLowerCase().includes(busqueda.toLowerCase()) || 
     v.ubicacion.toLowerCase().includes(busqueda.toLowerCase())
@@ -58,7 +57,6 @@ export default function Dashboard() {
     <div className="min-h-screen bg-slate-50 p-6 md:p-12">
       <div className="max-w-7xl mx-auto">
         
-        {/* CABECERA */}
         <header className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
           <div>
             <div className="flex items-center gap-3 mb-2">
@@ -77,7 +75,6 @@ export default function Dashboard() {
           </button>
         </header>
 
-        {/* MÉTRICAS (NUEVO) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
             <div className="bg-blue-100 p-4 rounded-xl text-blue-600">
@@ -110,7 +107,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* BUSCADOR (NUEVO) */}
         <div className="mb-8 relative">
           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
             <Search className="h-5 w-5 text-slate-400" />
@@ -124,7 +120,6 @@ export default function Dashboard() {
           />
         </div>
 
-        {/* LISTADO DE TARJETAS */}
         {loading ? (
           <div className="flex justify-center p-20">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
@@ -170,7 +165,7 @@ export default function Dashboard() {
                     <h3 className="text-xl font-bold text-slate-800 mb-1">{vendedor.nombre_puesto}</h3>
                     <p className="text-slate-500 text-sm mb-4">👤 Titular: {vendedor.titular}</p>
                     
-                    <div className="space-y-3">
+                    <div className="space-y-3 mb-6">
                       <div className="flex items-start gap-2 text-sm text-slate-600">
                         <MapPin className="h-4 w-4 mt-0.5 text-slate-400 shrink-0" />
                         <span>{vendedor.ubicacion}</span>
@@ -196,6 +191,15 @@ export default function Dashboard() {
                         </span>
                       </div>
                     </div>
+
+                    {/* BOTÓN EDITAR */}
+                    <button 
+                      onClick={() => navigate(`/editar/${vendedor.id}`)}
+                      className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 rounded-lg flex items-center justify-center gap-2 transition"
+                    >
+                      <Pencil className="h-4 w-4" />
+                      Editar Ficha
+                    </button>
                   </div>
                 </div>
               );
