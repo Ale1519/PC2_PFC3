@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { ShieldAlert, ShieldCheck, ThermometerSnowflake, MapPin, Store, AlertTriangle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ShieldAlert, ShieldCheck, ThermometerSnowflake, MapPin, Store, AlertTriangle, Plus } from 'lucide-react';
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const [vendedores, setVendedores] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -13,7 +15,6 @@ export default function Dashboard() {
   const fetchVendedores = async () => {
     try {
       setLoading(true);
-      // Traemos los vendedores con su última inspección usando una subconsulta de Supabase
       const { data, error } = await supabase
         .from('vendedores')
         .select(`
@@ -38,12 +39,22 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-slate-50 p-6 md:p-12">
       <div className="max-w-6xl mx-auto">
-        <header className="mb-10">
-          <div className="flex items-center gap-3 mb-2">
-            <ShieldCheck className="h-10 w-10 text-emerald-600" />
-            <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">PotaSegura</h1>
+        <header className="mb-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <ShieldCheck className="h-10 w-10 text-emerald-600" />
+              <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">PotaSegura</h1>
+            </div>
+            <p className="text-lg text-slate-600">Sistema de trazabilidad sanitaria y transparencia para vendedores de ceviche ambulante.</p>
           </div>
-          <p className="text-lg text-slate-600">Sistema de trazabilidad sanitaria y transparencia para vendedores de ceviche ambulante.</p>
+          
+          <button 
+            onClick={() => navigate('/registro')}
+            className="bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 px-6 rounded-xl flex items-center gap-2 shadow-sm transition cursor-pointer"
+          >
+            <Plus className="h-5 w-5" />
+            Nueva Inspección
+          </button>
         </header>
 
         {loading ? (
@@ -53,14 +64,12 @@ export default function Dashboard() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {vendedores.map((vendedor) => {
-              // Obtenemos la inspección más reciente
               const ultimaInspeccion = vendedor.inspecciones && vendedor.inspecciones.length > 0 
                 ? vendedor.inspecciones[vendedor.inspecciones.length - 1] 
                 : null;
               
               const estado = ultimaInspeccion?.estado_sanitario || 'Sin inspección';
               
-              // Definimos colores basados en el riesgo
               let bgRiesgo = "bg-slate-100";
               let textRiesgo = "text-slate-600";
               let IconRiesgo = Store;
