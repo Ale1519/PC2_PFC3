@@ -6,9 +6,12 @@ import { ArrowLeft } from 'lucide-react';
 export default function EditarVendedor() {
   const { id } = useParams();
   const navigate = useNavigate();
+  
   const [nombrePuesto, setNombrePuesto] = useState('');
   const [titular, setTitular] = useState('');
   const [ubicacion, setUbicacion] = useState('');
+  const [tieneLicencia, setTieneLicencia] = useState(false);
+  const [transparencia, setTransparencia] = useState(false);
 
   useEffect(() => {
     const cargarVendedor = async () => {
@@ -19,6 +22,8 @@ export default function EditarVendedor() {
         setNombrePuesto(data.nombre_puesto);
         setTitular(data.titular);
         setUbicacion(data.ubicacion);
+        setTieneLicencia(data.tiene_licencia);
+        setTransparencia(data.transparencia_ingredientes);
       }
     };
     cargarVendedor();
@@ -29,7 +34,9 @@ export default function EditarVendedor() {
     await supabase.from('vendedores').update({
       nombre_puesto: nombrePuesto,
       titular: titular,
-      ubicacion: ubicacion
+      ubicacion: ubicacion,
+      tiene_licencia: tieneLicencia,
+      transparencia_ingredientes: transparencia
     }).eq('id', id);
     navigate('/');
   };
@@ -45,21 +52,32 @@ export default function EditarVendedor() {
         </button>
         
         <form onSubmit={handleUpdate} className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
-          <h2 className="text-2xl font-bold mb-6 text-slate-800">Editar Ficha del Puesto</h2>
+          <h2 className="text-2xl font-bold mb-6 text-slate-800">Editar Ficha Completa</h2>
           
           <div className="mb-4">
             <label className="block text-sm font-semibold text-slate-700 mb-1">Nombre Comercial</label>
-            <input className="w-full border border-slate-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-emerald-500" value={nombrePuesto} onChange={(e) => setNombrePuesto(e.target.value)} placeholder="Ej. El Huarique de la Pota" />
+            <input className="w-full border border-slate-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-emerald-500" value={nombrePuesto} onChange={(e) => setNombrePuesto(e.target.value)} />
           </div>
           
           <div className="mb-4">
             <label className="block text-sm font-semibold text-slate-700 mb-1">Titular</label>
-            <input className="w-full border border-slate-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-emerald-500" value={titular} onChange={(e) => setTitular(e.target.value)} placeholder="Ej. Juan Pérez" />
+            <input className="w-full border border-slate-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-emerald-500" value={titular} onChange={(e) => setTitular(e.target.value)} />
           </div>
           
           <div className="mb-6">
             <label className="block text-sm font-semibold text-slate-700 mb-1">Ubicación</label>
-            <input className="w-full border border-slate-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-emerald-500" value={ubicacion} onChange={(e) => setUbicacion(e.target.value)} placeholder="Ej. Av. Grau 500" />
+            <input className="w-full border border-slate-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-emerald-500" value={ubicacion} onChange={(e) => setUbicacion(e.target.value)} />
+          </div>
+
+          <div className="flex gap-8 mb-8">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" className="w-5 h-5 accent-emerald-600" checked={tieneLicencia} onChange={(e) => setTieneLicencia(e.target.checked)} />
+              <span className="text-sm font-semibold text-slate-700">Cuenta con Licencia</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" className="w-5 h-5 accent-emerald-600" checked={transparencia} onChange={(e) => setTransparencia(e.target.checked)} />
+              <span className="text-sm font-semibold text-slate-700">Transparencia (Pota)</span>
+            </label>
           </div>
           
           <button className="bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 rounded-lg w-full transition">
