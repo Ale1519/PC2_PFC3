@@ -12,8 +12,8 @@ export default function RegistrarInspeccion() {
   const [nombrePuesto, setNombrePuesto] = useState('');
   const [titular, setTitular] = useState('');
   const [ubicacion, setUbicacion] = useState('');
-  const [tieneLicencia, setTieneLicencia] = useState(false);
-  const [transparencia, setTransparencia] = useState(false);
+  const [tieneLicencia, setTieneLicencia] = useState('false'); // selector
+  const [transparencia, setTransparencia] = useState('true');  // VENDRE POR DEFECTO EN TRUE ("Sí avisa")
 
   // Estados del formulario Inspección
   const [temperatura, setTemperatura] = useState('');
@@ -25,23 +25,21 @@ export default function RegistrarInspeccion() {
     setError(null);
 
     try {
-      // 1. Guardar el Vendedor en Supabase
       const { data: vendedorData, error: errorVendedor } = await supabase
         .from('vendedores')
         .insert([{
           nombre_puesto: nombrePuesto,
           titular: titular,
           ubicacion: ubicacion,
-          tiene_licencia: tieneLicencia,
-          transparencia_ingredientes: transparencia,
-          usa_pota: true // Fijo para este caso de estudio
+          tiene_licencia: tieneLicencia === 'true',
+          transparencia_ingredientes: transparencia === 'true', // Lee 'true' y lo pasa como booleano true
+          usa_pota: true
         }])
         .select()
-        .single(); // Para que devuelva el ID recién creado
+        .single();
 
       if (errorVendedor) throw errorVendedor;
 
-      // 2. Usar el ID del nuevo vendedor para guardar su Inspección
       const { error: errorInspeccion } = await supabase
         .from('inspecciones')
         .insert([{
@@ -52,7 +50,6 @@ export default function RegistrarInspeccion() {
 
       if (errorInspeccion) throw errorInspeccion;
 
-      // 3. Si todo salió bien, regresar al Dashboard
       navigate('/');
 
     } catch (err: any) {
@@ -68,7 +65,7 @@ export default function RegistrarInspeccion() {
       <div className="max-w-3xl mx-auto">
         <button 
           onClick={() => navigate('/')}
-          className="flex items-center text-slate-500 hover:text-emerald-700 mb-6 transition"
+          className="flex items-center text-slate-500 hover:text-emerald-700 mb-6 transition cursor-pointer"
         >
           <ArrowLeft className="h-4 w-4 mr-2" /> Volver al Panel
         </button>
@@ -119,17 +116,30 @@ export default function RegistrarInspeccion() {
                     placeholder="Ej. Esquina Av. Grau con Abancay"
                   />
                 </div>
-              </div>
-              
-              <div className="flex gap-6 mt-4">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" checked={tieneLicencia} onChange={(e) => setTieneLicencia(e.target.checked)} className="w-5 h-5 text-emerald-600 rounded" />
-                  <span className="text-sm text-slate-700 font-medium">Cuenta con Licencia Municipal</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" checked={transparencia} onChange={(e) => setTransparencia(e.target.checked)} className="w-5 h-5 text-emerald-600 rounded" />
-                  <span className="text-sm text-slate-700 font-medium">Es transparente con el uso de Pota</span>
-                </label>
+
+                {/* NUEVOS DESPLEGABLES GIGANTES */}
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Licencia Municipal</label>
+                  <select 
+                    value={tieneLicencia} onChange={(e) => setTieneLicencia(e.target.value)}
+                    className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none bg-white font-medium"
+                  >
+                    <option value="false">❌ No tiene (Informal)</option>
+                    <option value="true">✅ Sí tiene Licencia</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Transparencia con la Pota</label>
+                  <select 
+                    value={transparencia} onChange={(e) => setTransparencia(e.target.value)}
+                    className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none bg-white font-medium"
+                  >
+                    <option value="true">🟢 Sí avisa que vende Pota</option>
+                    <option value="false">🔴 Engaño (lo hace pasar por pescado)</option>
+                  </select>
+                </div>
+
               </div>
             </section>
 
@@ -149,7 +159,7 @@ export default function RegistrarInspeccion() {
                   <label className="block text-sm font-semibold text-slate-700 mb-1">Dictamen Sanitario</label>
                   <select 
                     value={estadoSanitario} onChange={(e) => setEstadoSanitario(e.target.value)}
-                    className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none bg-white"
+                    className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none bg-white font-medium"
                   >
                     <option value="Aprobado">🟢 Aprobado (Bajo Riesgo)</option>
                     <option value="Observado">🟡 Observado (Riesgo Moderado)</option>
@@ -162,7 +172,7 @@ export default function RegistrarInspeccion() {
             <button 
               type="submit" 
               disabled={loading}
-              className="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-4 rounded-xl flex justify-center items-center gap-2 transition disabled:opacity-70"
+              className="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-4 rounded-xl flex justify-center items-center gap-2 transition disabled:opacity-70 cursor-pointer"
             >
               {loading ? (
                 <span className="animate-pulse">Guardando en base de datos...</span>
