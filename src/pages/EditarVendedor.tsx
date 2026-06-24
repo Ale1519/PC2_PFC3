@@ -20,8 +20,8 @@ export default function EditarVendedor() {
 
   useEffect(() => {
     const cargarDatos = async () => {
-      // Cargamos el vendedor y su última inspección
-      const { data, error } = await supabase
+      // Usamos el guion bajo para evitar el error de variable no leída
+      const { data, error: _ } = await supabase
         .from('vendedores')
         .select('*, inspecciones(*)')
         .eq('id', id)
